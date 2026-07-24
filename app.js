@@ -7,18 +7,18 @@ const state={
   activeProfileId:localStorage.getItem("pc_active_profile_v12")||localStorage.getItem("pc_active_profile_v11")||(savedProfiles?.[0]?.id||starter.id),
   adjustment:0,
   tracker:JSON.parse(localStorage.getItem("pc_tracker_v12")||localStorage.getItem("pc_tracker_v11")||"[]"),
-  settings:JSON.parse(localStorage.getItem("pc_settings_v12")||localStorage.getItem("pc_settings_v11")||'{"totalTolerance":5,"stockTolerance":5}')
+  settings:JSON.parse(localStorage.getItem("pc_settings_v13")||localStorage.getItem("pc_settings_v12")||localStorage.getItem("pc_settings_v11")||'{"attackDistanceLimit":170,"stockTolerance":5}')
 };
 if(!state.profiles.some(p=>p.id===state.activeProfileId))state.activeProfileId=state.profiles[0].id;
 
 const $=id=>document.getElementById(id);
-const els={pin:$("pinDistance"),carry:$("carryInput"),adjustments:$("adjustmentButtons"),result:$("resultCard"),profile:$("profileSelect"),clubList:$("clubList"),dialog:$("clubDialog"),form:$("clubForm"),clubId:$("clubId"),clubName:$("clubName"),clubCarry:$("clubCarry"),clubTotal:$("clubTotal"),trackerList:$("trackerList"),trackerFilter:$("trackerFilter"),totalTolerance:$("totalTolerance"),stockTolerance:$("stockTolerance")};
+const els={pin:$("pinDistance"),carry:$("carryInput"),adjustments:$("adjustmentButtons"),result:$("resultCard"),profile:$("profileSelect"),clubList:$("clubList"),dialog:$("clubDialog"),form:$("clubForm"),clubId:$("clubId"),clubName:$("clubName"),clubCarry:$("clubCarry"),clubTotal:$("clubTotal"),trackerList:$("trackerList"),trackerFilter:$("trackerFilter"),attackDistanceLimit:$("attackDistanceLimit"),stockTolerance:$("stockTolerance")};
 
 function save(){
   localStorage.setItem("pc_profiles_v12",JSON.stringify(state.profiles));
   localStorage.setItem("pc_active_profile_v12",state.activeProfileId);
   localStorage.setItem("pc_tracker_v12",JSON.stringify(state.tracker));
-  localStorage.setItem("pc_settings_v12",JSON.stringify(state.settings));
+  localStorage.setItem("pc_settings_v13",JSON.stringify(state.settings));
 }
 function profile(){return state.profiles.find(p=>p.id===state.activeProfileId)}
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
@@ -52,9 +52,10 @@ function recommend(){
   const carryEntered=Number.isFinite(requiredCarry)&&requiredCarry>0;
   const best=carryEntered?pickWithCarryRequirement(clubs,target,requiredCarry):pickByTotal(clubs,target);
   const hasSavedCarry=Number.isFinite(Number(best.carry))&&Number(best.carry)>0;
-  const totalPass=Math.abs(best.total-target)<=state.settings.totalTolerance;
-  const stockPass=hasSavedCarry?Math.abs(best.carry-target)<=state.settings.stockTolerance:true;
-  const green=totalPass&&stockPass;
+  const attackDistancePass=target<Number(state.settings.attackDistanceLimit);
+  const stockReference=hasSavedCarry?Number(best.carry):Number(best.total);
+  const stockPass=Math.abs(stockReference-target)<=Number(state.settings.stockTolerance);
+  const green=attackDistancePass&&stockPass;
   const range=getDisplayRange(best,clubs);
 
   let note="";
@@ -68,7 +69,18 @@ function recommend(){
     note=`<div class="warning">Total-distance recommendation only. No carry distance is saved for this club.</div>`;
   }
 
-  els.result.innerHTML=`<div class="result-wrap"><div class="club-badge ${green?"green":"safe"}">${green?`<div><div class="mode-icon">🚩</div><div class="club-name-large">${esc(best.name)}</div><div class="range-text">${range}</div></div>`:`<div><div class="mode-label">CENTER</div><div class="mode-icon">⛳</div><div class="club-name-large">${esc(best.name)}</div><div class="range-text">${range}</div></div>`}</div>${note}</div>`;
+  els.result.innerHTML=`<div class="result-split">
+    <div class="result-details">
+      <div class="club-name-large">${esc(best.name)}</div>
+      <div class="range-text">${range}</div>
+    </div>
+    <div class="status-wrap">
+      <div class="status-circle ${green?"attack":"safe"}">
+        ${green?`<div><div class="mode-icon">🚩</div><div class="mode-label">ATTACK</div></div>`:`<div><div class="mode-label">CENTER</div><div class="mode-icon">⛳</div></div>`}
+      </div>
+    </div>
+    ${note?`<div class="result-note">${note}</div>`:""}
+  </div>`;
 
   state.tracker.push({clubId:best.id,clubName:best.name,time:Date.now()});save();renderTracker();
 }
@@ -96,6 +108,14 @@ function openClub(club){
 }
 els.adjustments.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;state.adjustment=Number(b.dataset.adjustment);[...els.adjustments.children].forEach(x=>x.classList.toggle("selected",x===b))});
 $("recommendBtn").addEventListener("click",recommend);
+$("resetShotBtn").addEventListener("click",()=>{
+  els.pin.value="";
+  els.carry.value="";
+  state.adjustment=0;
+  [...els.adjustments.children].forEach(b=>b.classList.toggle("selected",Number(b.dataset.adjustment)===0));
+  els.result.innerHTML='<p class="muted">Enter a pin distance to get your recommendation.</p>';
+  els.pin.focus();
+});
 els.pin.addEventListener("keydown",e=>{if(e.key==="Enter")recommend()});
 els.profile.addEventListener("change",e=>{state.activeProfileId=e.target.value;save();renderClubs()});
 $("addClubBtn").addEventListener("click",()=>openClub());
@@ -121,10 +141,15 @@ $("renameProfileBtn").addEventListener("click",()=>{const p=profile(),name=promp
 $("deleteProfileBtn").addEventListener("click",()=>{if(state.profiles.length===1)return alert("Keep at least one bag profile.");if(confirm(`Delete "${profile().name}"?`)){state.profiles=state.profiles.filter(p=>p.id!==state.activeProfileId);state.activeProfileId=state.profiles[0].id;save();renderProfiles();renderClubs()}});
 els.trackerFilter.addEventListener("change",renderTracker);
 $("resetTrackerBtn").addEventListener("click",()=>{if(confirm("Reset all tracker data?")){state.tracker=[];save();renderTracker()}});
-els.totalTolerance.value=state.settings.totalTolerance;els.stockTolerance.value=state.settings.stockTolerance;
-[els.totalTolerance,els.stockTolerance].forEach(el=>el.addEventListener("change",()=>{
-  state.settings.totalTolerance=Math.max(0,Number(els.totalTolerance.value)||0);
-  state.settings.stockTolerance=Math.max(0,Number(els.stockTolerance.value)||0);save();
+if(!state.settings.attackDistanceLimit){
+  state.settings.attackDistanceLimit=170;
+}
+els.attackDistanceLimit.value=state.settings.attackDistanceLimit;
+els.stockTolerance.value=state.settings.stockTolerance;
+[els.attackDistanceLimit,els.stockTolerance].forEach(el=>el.addEventListener("change",()=>{
+  state.settings.attackDistanceLimit=Math.max(1,Number(els.attackDistanceLimit.value)||170);
+  state.settings.stockTolerance=Math.max(0,Number(els.stockTolerance.value)||0);
+  save();
 }));
 document.querySelectorAll(".nav-button").forEach(btn=>btn.addEventListener("click",()=>{
   document.querySelectorAll(".nav-button").forEach(b=>b.classList.toggle("active",b===btn));

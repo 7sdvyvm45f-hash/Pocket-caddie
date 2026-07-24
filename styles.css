@@ -58,3 +58,26 @@ dialog::backdrop{background:#0c241bb8}dialog form{display:grid;gap:14px;padding:
 dialog label{display:grid;gap:6px;font-weight:800}dialog input{border:1px solid var(--line);border-radius:11px;padding:12px}
 .dialog-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 @media(max-width:420px){.club-badge{width:190px;height:190px}.club-name-large{font-size:36px}}
+
+.shot-actions{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:stretch}
+.reset-shot{min-width:104px}
+.result-card{min-height:250px}
+.result-split{width:100%;display:grid;grid-template-columns:1.2fr .8fr;align-items:center;gap:18px;text-align:left}
+.result-details{display:grid;gap:8px;align-content:center}
+.result-details .club-name-large{font-size:48px}
+.result-details .range-text{font-size:18px}
+.status-wrap{display:grid;place-items:center;gap:8px}
+.status-circle{width:150px;height:150px;border-radius:50%;display:grid;place-items:center;text-align:center}
+.status-circle.attack{border:10px solid #48a85f;background:#eef9ef}
+.status-circle.safe{border:10px solid #aeb7b0;background:#f3f5f3}
+.status-circle .mode-icon{font-size:54px}
+.status-circle .mode-label{font-size:13px}
+.result-note{grid-column:1 / -1;justify-self:center}
+@media(max-width:420px){
+  .shot-actions{grid-template-columns:1fr}
+  .reset-shot{width:100%}
+  .result-split{grid-template-columns:1fr 140px;gap:10px}
+  .result-details .club-name-large{font-size:34px}
+  .status-circle{width:128px;height:128px}
+  .status-circle .mode-icon{font-size:46px}
+}

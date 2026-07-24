@@ -1,10 +1,13 @@
-# Pocket Caddie v1.2
+# Pocket Caddie v1.4
 
-## Carry behavior
-- Leave Required Carry blank: recommendations work from pin distance, adjustment, and club total distance.
-- Enter Required Carry: the app only prefers clubs with saved carry distances that cover the required carry.
-- If the recommended club has no saved carry number, the result is clearly flagged as based on total distance only.
-- Existing v1.1 bag, tracker, and settings data are migrated automatically when available.
+## Changes
+- Pin Distance and Optional Required Carry start blank.
+- Added a New Shot button.
+- New Shot clears both inputs, resets adjustment to 0, clears the old recommendation, and returns focus to Pin Distance.
+- Recommendation panel is split:
+  - Left: recommended club and distance range.
+  - Right: green Attack circle with flag or grey Center circle with green icon.
+- Existing bag, tracker, and settings behavior remains unchanged.
 
 ## Updating GitHub Pages
 Replace the old repository files with the contents of this folder. Keep index.html at the repository root.

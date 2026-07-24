@@ -23,13 +23,13 @@
       <div class="card input-card">
         <label for="pinDistance">Pin Distance</label>
         <div class="distance-entry">
-          <input id="pinDistance" type="number" inputmode="numeric" min="1" max="400" placeholder="157" />
+          <input id="pinDistance" type="number" inputmode="numeric" min="1" max="400" placeholder="" />
           <span>yds</span>
         </div>
 
         <label for="carryInput" class="optional-label">Optional Required Carry</label>
         <div class="distance-entry small">
-          <input id="carryInput" type="number" inputmode="numeric" min="1" max="400" placeholder="150" />
+          <input id="carryInput" type="number" inputmode="numeric" min="1" max="400" placeholder="" />
           <span>yds</span>
         </div>
         <p class="helper">Use this only when the shot must carry a bunker, water, rough, or another obstacle.</p>
@@ -43,7 +43,10 @@
           <button data-adjustment="10">+10</button>
         </div>
 
-        <button id="recommendBtn" class="primary">Recommend Club</button>
+        <div class="shot-actions">
+          <button id="recommendBtn" class="primary">Recommend Club</button>
+          <button id="resetShotBtn" class="ghost reset-shot">New Shot</button>
+        </div>
       </div>
 
       <div id="resultCard" class="card result-card">
@@ -106,16 +109,16 @@
 
         <label class="setting-row">
           <span>
-            <strong>Total Distance Tolerance</strong>
-            <small>How close the target must be to the club's total distance.</small>
+            <strong>Attack Distance Limit</strong>
+            <small>Attack only when the adjusted pin distance is less than this number.</small>
           </span>
-          <input id="totalTolerance" type="number" min="0" max="25" value="5" />
+          <input id="attackDistanceLimit" type="number" min="1" max="400" value="170" />
         </label>
 
         <label class="setting-row">
           <span>
             <strong>Stock Yardage Tolerance</strong>
-            <small>Used when the club has a saved carry number.</small>
+            <small>Attack only when the target is within this many yards of the recommended club's stock distance.</small>
           </span>
           <input id="stockTolerance" type="number" min="0" max="25" value="5" />
         </label>
@@ -137,7 +140,7 @@
       <h2 id="clubDialogTitle">Add Club</h2>
       <input type="hidden" id="clubId" />
       <label>Club Name<input id="clubName" required maxlength="20" placeholder="7 Iron" /></label>
-      <label>Carry Distance (optional)<input id="clubCarry" type="number" min="1" max="400" placeholder="150" /></label>
+      <label>Carry Distance (optional)<input id="clubCarry" type="number" min="1" max="400" placeholder="" /></label>
       <label>Total Distance<input id="clubTotal" required type="number" min="1" max="400" placeholder="160" /></label>
       <div class="dialog-actions">
         <button value="cancel" class="ghost">Cancel</button>
