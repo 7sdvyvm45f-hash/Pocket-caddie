@@ -111,3 +111,13 @@ dialog label{display:grid;gap:6px;font-weight:800}dialog input{border:1px solid 
   .shot-actions{grid-template-columns:minmax(0,1fr) auto}
   .reset-shot{width:auto;min-width:96px}
 }
+
+/* v1.7 custom strategy icons */
+.strategy-icon{width:82px;height:82px;display:block;margin:0 auto 4px}
+.flagstick{stroke:#123d2c;stroke-width:7;stroke-linecap:round}
+.gold-flag{fill:#d5a928;stroke:#b68b13;stroke-width:2}
+.green-shadow{fill:#80b88a;opacity:.48}
+.green-fringe{fill:#2f7452}
+.putting-surface{fill:#66ae72}
+.center-target{fill:#f7f7f2;stroke:#d9ddd9;stroke-width:2}
+.status-circle.safe .mode-label{margin-bottom:0}

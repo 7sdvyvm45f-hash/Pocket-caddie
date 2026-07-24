@@ -76,7 +76,15 @@ function recommend(){
     </div>
     <div class="status-wrap">
       <div class="status-circle ${green?"attack":"safe"}">
-        ${green?`<div><div class="mode-icon">🚩</div><div class="mode-label">ATTACK</div></div>`:`<div><div class="mode-label">CENTER</div><div class="mode-icon">⛳</div></div>`}
+        ${green?`<div><svg class="strategy-icon attack-icon" viewBox="0 0 120 120" aria-hidden="true">
+  <line x1="49" y1="25" x2="49" y2="91" class="flagstick"/>
+  <path d="M51 27 L89 38 L51 51 Z" class="gold-flag"/>
+  <ellipse cx="57" cy="94" rx="31" ry="8" class="green-shadow"/>
+</svg><div class="mode-label">ATTACK</div></div>`:`<div><div class="mode-label">CENTER</div><svg class="strategy-icon center-icon" viewBox="0 0 120 120" aria-hidden="true">
+  <ellipse cx="60" cy="68" rx="43" ry="27" class="green-fringe"/>
+  <ellipse cx="60" cy="66" rx="33" ry="19" class="putting-surface"/>
+  <circle cx="60" cy="66" r="5" class="center-target"/>
+</svg></div>`}
       </div>
     </div>
     ${note?`<div class="result-note">${note}</div>`:""}
