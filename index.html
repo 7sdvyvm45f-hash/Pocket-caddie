@@ -4,10 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#123d2c" />
-  <meta name="description" content="A fast, offline golf club recommendation app." />
+  <meta name="description" content="Pocket Caddie golf club recommendation app." />
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
-  <link rel="icon" href="icons/icon-192.png" />
   <link rel="stylesheet" href="styles.css" />
   <title>Pocket Caddie</title>
 </head>
@@ -17,20 +16,26 @@
       <p class="eyebrow">YOUR CLUB. YOUR NUMBER.</p>
       <h1>Pocket Caddie</h1>
     </div>
-    <button id="installBtn" class="ghost hidden">Install</button>
   </header>
 
   <main>
     <section id="recommendView" class="view active">
-      <div class="card hero-card">
-        <label for="pinDistance">Pin distance</label>
+      <div class="card input-card">
+        <label for="pinDistance">Pin Distance</label>
         <div class="distance-entry">
-          <input id="pinDistance" type="number" inputmode="numeric" min="1" max="400" placeholder="157" aria-label="Pin distance in yards" />
+          <input id="pinDistance" type="number" inputmode="numeric" min="1" max="400" placeholder="157" />
           <span>yds</span>
         </div>
 
+        <label for="carryInput" class="optional-label">Optional Required Carry</label>
+        <div class="distance-entry small">
+          <input id="carryInput" type="number" inputmode="numeric" min="1" max="400" placeholder="150" />
+          <span>yds</span>
+        </div>
+        <p class="helper">Use this only when the shot must carry a bunker, water, rough, or another obstacle.</p>
+
         <div class="section-label">Adjustment</div>
-        <div id="adjustmentButtons" class="segmented" role="group" aria-label="Distance adjustment">
+        <div id="adjustmentButtons" class="segmented">
           <button data-adjustment="-10">-10</button>
           <button data-adjustment="-5">-5</button>
           <button data-adjustment="0" class="selected">0</button>
@@ -38,28 +43,11 @@
           <button data-adjustment="10">+10</button>
         </div>
 
-        <button id="recommendBtn" class="primary">Recommend club</button>
+        <button id="recommendBtn" class="primary">Recommend Club</button>
       </div>
 
-      <div id="resultCard" class="card result-card" aria-live="polite">
-        <p class="muted">Enter a distance to get your recommendation.</p>
-      </div>
-
-      <div class="card">
-        <div class="green-light-row">
-          <div>
-            <h2>Green light</h2>
-            <p class="muted">Attack when the playing distance is within your preferred range.</p>
-          </div>
-          <label class="switch">
-            <input id="greenLightEnabled" type="checkbox" checked />
-            <span></span>
-          </label>
-        </div>
-        <div class="range-row">
-          <label>From <input id="greenLightMin" type="number" min="1" max="400" value="70" /> yds</label>
-          <label>To <input id="greenLightMax" type="number" min="1" max="400" value="165" /> yds</label>
-        </div>
+      <div id="resultCard" class="card result-card">
+        <p class="muted">Enter a pin distance to get your recommendation.</p>
       </div>
     </section>
 
@@ -67,59 +55,93 @@
       <div class="card">
         <div class="toolbar">
           <div>
-            <p class="section-label">Active bag</p>
-            <select id="profileSelect" aria-label="Active bag profile"></select>
+            <p class="section-label">Active Bag</p>
+            <select id="profileSelect"></select>
           </div>
-          <button id="newProfileBtn" class="secondary">New profile</button>
+          <button id="newProfileBtn" class="secondary">New Profile</button>
         </div>
       </div>
 
       <div class="card">
         <div class="toolbar">
           <div>
-            <h2>My bag</h2>
-            <p class="muted">Carry distances are saved automatically.</p>
+            <h2>My Bag</h2>
+            <p class="muted">Carry is optional. Total distance is required.</p>
           </div>
-          <button id="addClubBtn" class="secondary">Add club</button>
+          <button id="addClubBtn" class="secondary">Add Club</button>
         </div>
         <div id="clubList" class="club-list"></div>
       </div>
 
       <div class="card danger-zone">
-        <button id="renameProfileBtn" class="ghost">Rename profile</button>
-        <button id="deleteProfileBtn" class="danger">Delete profile</button>
+        <button id="renameProfileBtn" class="ghost">Rename Profile</button>
+        <button id="deleteProfileBtn" class="danger">Delete Profile</button>
       </div>
     </section>
 
-    <section id="historyView" class="view">
+    <section id="trackerView" class="view">
       <div class="card">
         <div class="toolbar">
           <div>
-            <h2>Recent recommendations</h2>
-            <p class="muted">Stored only on this device.</p>
+            <h2>Recommendation Tracker</h2>
+            <p class="muted">Counts recommendations only.</p>
           </div>
-          <button id="clearHistoryBtn" class="ghost">Clear</button>
+          <select id="trackerFilter">
+            <option value="today">Today</option>
+            <option value="7">Past 7 Days</option>
+            <option value="30">Past 30 Days</option>
+            <option value="year">This Year</option>
+            <option value="all">All Time</option>
+          </select>
         </div>
-        <div id="historyList" class="history-list"></div>
+        <div id="trackerList" class="tracker-list"></div>
+        <button id="resetTrackerBtn" class="danger full">Reset Tracker</button>
+      </div>
+    </section>
+
+    <section id="settingsView" class="view">
+      <div class="card">
+        <h2>Green Light Settings</h2>
+        <p class="muted">A Green Light appears only when both applicable conditions are met.</p>
+
+        <label class="setting-row">
+          <span>
+            <strong>Total Distance Tolerance</strong>
+            <small>How close the target must be to the club's total distance.</small>
+          </span>
+          <input id="totalTolerance" type="number" min="0" max="25" value="5" />
+        </label>
+
+        <label class="setting-row">
+          <span>
+            <strong>Stock Yardage Tolerance</strong>
+            <small>Used when the club has a saved carry number.</small>
+          </span>
+          <input id="stockTolerance" type="number" min="0" max="25" value="5" />
+        </label>
+
+        <p class="settings-note">Settings save automatically on this device.</p>
       </div>
     </section>
   </main>
 
-  <nav class="bottom-nav" aria-label="Primary navigation">
+  <nav class="bottom-nav">
     <button class="nav-button active" data-view="recommendView"><span>⛳</span>Recommend</button>
     <button class="nav-button" data-view="bagView"><span>🏌️</span>My Bag</button>
-    <button class="nav-button" data-view="historyView"><span>↻</span>History</button>
+    <button class="nav-button" data-view="trackerView"><span>📊</span>Tracker</button>
+    <button class="nav-button" data-view="settingsView"><span>⚙️</span>Settings</button>
   </nav>
 
   <dialog id="clubDialog">
     <form method="dialog" id="clubForm">
-      <h2 id="clubDialogTitle">Add club</h2>
+      <h2 id="clubDialogTitle">Add Club</h2>
       <input type="hidden" id="clubId" />
-      <label>Club name<input id="clubName" required maxlength="20" placeholder="7 Iron" /></label>
-      <label>Carry distance<input id="clubCarry" required type="number" min="1" max="400" inputmode="numeric" placeholder="162" /></label>
+      <label>Club Name<input id="clubName" required maxlength="20" placeholder="7 Iron" /></label>
+      <label>Carry Distance (optional)<input id="clubCarry" type="number" min="1" max="400" placeholder="150" /></label>
+      <label>Total Distance<input id="clubTotal" required type="number" min="1" max="400" placeholder="160" /></label>
       <div class="dialog-actions">
         <button value="cancel" class="ghost">Cancel</button>
-        <button id="saveClubBtn" value="default" class="primary">Save</button>
+        <button value="default" class="primary">Save</button>
       </div>
     </form>
   </dialog>

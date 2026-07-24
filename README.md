@@ -1,31 +1,10 @@
-# Pocket Caddie PWA
+# Pocket Caddie v1.2
 
-A phone-friendly, offline-capable club recommendation app.
+## Carry behavior
+- Leave Required Carry blank: recommendations work from pin distance, adjustment, and club total distance.
+- Enter Required Carry: the app only prefers clubs with saved carry distances that cover the required carry.
+- If the recommended club has no saved carry number, the result is clearly flagged as based on total distance only.
+- Existing v1.1 bag, tracker, and settings data are migrated automatically when available.
 
-## Run locally
-A service worker requires HTTPS or localhost.
-
-### Python
-```bash
-cd pocket-caddie-pwa
-python3 -m http.server 8080
-```
-Open http://localhost:8080.
-
-## Install on iPhone
-1. Host the folder on an HTTPS site such as GitHub Pages, Netlify, Vercel, or Replit.
-2. Open the site in Safari.
-3. Tap Share.
-4. Tap Add to Home Screen.
-
-## Included
-- Pin distance input
-- -10, -5, 0, +5, +10 adjustment
-- Playing-distance calculation
-- Closest-club recommendation
-- Editable clubs and carry distances
-- Multiple saved bag profiles
-- Automatic local saving
-- Configurable Green Light range
-- Recommendation history
-- Offline service worker
+## Updating GitHub Pages
+Replace the old repository files with the contents of this folder. Keep index.html at the repository root.
