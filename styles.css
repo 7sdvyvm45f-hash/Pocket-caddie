@@ -81,3 +81,15 @@ dialog label{display:grid;gap:6px;font-weight:800}dialog input{border:1px solid 
   .status-circle{width:128px;height:128px}
   .status-circle .mode-icon{font-size:46px}
 }
+
+.app-header{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.header-shot-btn{
+  border:1px solid rgba(255,255,255,.45);
+  background:rgba(255,255,255,.1);
+  color:#fff;
+  border-radius:999px;
+  padding:10px 14px;
+  font-weight:850;
+  white-space:nowrap;
+}
+.header-shot-btn:active{transform:translateY(1px)}
