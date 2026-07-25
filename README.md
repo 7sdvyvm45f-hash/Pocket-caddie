@@ -1,18 +1,14 @@
-# Pocket Caddie 2.0
+# Pocket Caddie 2.0.2
 
-Pocket Caddie 2.0 includes the complete feature set from v1.7:
-
-- Total Distance input
-- Minimum Carry input
-- Adjustment controls
-- Club recommendation logic using total and carry distance
-- Green Light / Center strategy logic
-- Custom gold Attack flag
-- Putting-green-only Center icon
-- Editable club bag and saved bag profiles
-- Recommendation tracker with date filters
-- Settings for attack distance and stock-yardage tolerance
-- Offline Progressive Web App support
+## Changes
+- Updated the Center graphic:
+  - removed the white center ball/target
+  - changed the putting green to a more natural, irregular shape
+  - kept the green inside the grey Center circle
+- Updated gap handling:
+  - when the target falls between two club total distances, Pocket Caddie selects the longer club
+  - the recommendation includes a note explaining it was selected because of a gap in club distances
+  - Minimum Carry filtering still applies before gap handling when a carry requirement is entered
 
 ## Updating GitHub Pages
 Replace the old repository files with the contents of this folder. Keep index.html at the repository root.

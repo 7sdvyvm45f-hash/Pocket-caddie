@@ -119,5 +119,6 @@ dialog label{display:grid;gap:6px;font-weight:800}dialog input{border:1px solid 
 .green-shadow{fill:#80b88a;opacity:.48}
 .green-fringe{fill:#2f7452}
 .putting-surface{fill:#66ae72}
-.center-target{fill:#f7f7f2;stroke:#d9ddd9;stroke-width:2}
 .status-circle.safe .mode-label{margin-bottom:0}
+
+.gap-note{margin-top:2px;max-width:340px;padding:9px 12px;border-radius:12px;background:#edf1f5;color:#46515b;font-size:12px;font-weight:800}

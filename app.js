@@ -35,12 +35,18 @@ function getDisplayRange(club,clubs){
   return next?`${next.total}–${club.total} yds`:`Up to ${club.total} yds`;
 }
 function pickByTotal(clubs,target){
-  return clubs.reduce((a,b)=>Math.abs(b.total-target)<Math.abs(a.total-target)?b:a);
+  const sorted=[...clubs].sort((a,b)=>Number(a.total)-Number(b.total));
+  const longer=sorted.find(c=>Number(c.total)>=target);
+  if(!longer)return {club:sorted[sorted.length-1],gapRecommendation:false};
+  const index=sorted.findIndex(c=>c.id===longer.id);
+  const shorter=index>0?sorted[index-1]:null;
+  const gapRecommendation=Boolean(shorter&&target>Number(shorter.total)&&target<Number(longer.total));
+  return {club:longer,gapRecommendation};
 }
 function pickWithCarryRequirement(clubs,target,requiredCarry){
-  const eligible=clubs.filter(c=>c.carry&&c.carry>=requiredCarry);
+  const eligible=clubs.filter(c=>c.carry&&Number(c.carry)>=requiredCarry);
   if(!eligible.length)return pickByTotal(clubs,target);
-  return eligible.reduce((a,b)=>Math.abs(b.total-target)<Math.abs(a.total-target)?b:a);
+  return pickByTotal(eligible,target);
 }
 function recommend(){
   const pin=Number(els.pin.value), requiredCarry=Number(els.carry.value);
@@ -50,24 +56,31 @@ function recommend(){
   if(!clubs.length){els.result.innerHTML='<p class="muted">Add clubs to your bag first.</p>';return}
 
   const carryEntered=Number.isFinite(requiredCarry)&&requiredCarry>0;
-  const best=carryEntered?pickWithCarryRequirement(clubs,target,requiredCarry):pickByTotal(clubs,target);
+  const selection=carryEntered?pickWithCarryRequirement(clubs,target,requiredCarry):pickByTotal(clubs,target);
+  const best=selection.club;
+  const gapRecommendation=selection.gapRecommendation;
   const hasSavedCarry=Number.isFinite(Number(best.carry))&&Number(best.carry)>0;
-  const attackDistancePass=target<Number(state.settings.attackDistanceLimit);
+  const adjustedTotalDistance=pin+state.adjustment;
+  const attackDistancePass=adjustedTotalDistance<Number(state.settings.attackDistanceLimit);
   const stockReference=hasSavedCarry?Number(best.carry):Number(best.total);
-  const stockPass=Math.abs(stockReference-target)<=Number(state.settings.stockTolerance);
+  const stockPass=Math.abs(stockReference-adjustedTotalDistance)<=Number(state.settings.stockTolerance);
   const green=attackDistancePass&&stockPass;
   const range=getDisplayRange(best,clubs);
 
-  let note="";
+  let notes=[];
+  if(gapRecommendation){
+    notes.push(`<div class="gap-note">Recommended because your target falls in a gap between club distances. The longer club was selected to get past the target.</div>`);
+  }
   if(carryEntered){
     if(hasSavedCarry){
-      note=`<div class="carry-check">Carry checked: ${best.carry} yds covers the required ${requiredCarry} yds.</div>`;
+      notes.push(`<div class="carry-check">Carry checked: ${best.carry} yds covers the required ${requiredCarry} yds.</div>`);
     }else{
-      note=`<div class="warning">Carry could not be verified. This recommendation is based on total distance only.</div>`;
+      notes.push(`<div class="warning">Carry could not be verified. This recommendation is based on total distance only.</div>`);
     }
   }else if(!hasSavedCarry){
-    note=`<div class="warning">Total-distance recommendation only. No carry distance is saved for this club.</div>`;
+    notes.push(`<div class="warning">Total-distance recommendation only. No carry distance is saved for this club.</div>`);
   }
+  const note=notes.join("");
 
   els.result.innerHTML=`<div class="result-split">
     <div class="result-details">
@@ -81,9 +94,8 @@ function recommend(){
   <path d="M51 27 L89 38 L51 51 Z" class="gold-flag"/>
   <ellipse cx="57" cy="94" rx="31" ry="8" class="green-shadow"/>
 </svg><div class="mode-label">ATTACK</div></div>`:`<div><div class="mode-label">CENTER</div><svg class="strategy-icon center-icon" viewBox="0 0 120 120" aria-hidden="true">
-  <ellipse cx="60" cy="68" rx="43" ry="27" class="green-fringe"/>
-  <ellipse cx="60" cy="66" rx="33" ry="19" class="putting-surface"/>
-  <circle cx="60" cy="66" r="5" class="center-target"/>
+  <path class="green-fringe" d="M18 68 C20 45 39 34 60 37 C80 29 101 43 103 62 C108 82 88 96 65 94 C44 101 20 91 18 68 Z"/>
+  <path class="putting-surface" d="M27 67 C30 50 44 43 60 45 C77 39 94 50 95 64 C98 79 82 87 64 85 C48 91 30 83 27 67 Z"/>
 </svg></div>`}
       </div>
     </div>
