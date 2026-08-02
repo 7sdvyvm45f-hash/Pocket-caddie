@@ -122,3 +122,13 @@ dialog label{display:grid;gap:6px;font-weight:800}dialog input{border:1px solid 
 .status-circle.safe .mode-label{margin-bottom:0}
 
 .gap-note{margin-top:2px;max-width:340px;padding:9px 12px;border-radius:12px;background:#edf1f5;color:#46515b;font-size:12px;font-weight:800}
+
+/* v1.8 recommendation summary */
+.pin-playing{
+  margin-bottom:4px;
+  color:var(--muted);
+  font-size:16px;
+  font-weight:800;
+}
+.pin-playing strong{color:var(--green);font-size:20px}
+.result-details .range-text{margin-top:2px}

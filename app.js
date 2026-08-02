@@ -5,21 +5,21 @@ const savedProfiles=JSON.parse(localStorage.getItem("pc_profiles_v12")||localSto
 const state={
   profiles:savedProfiles||[starter],
   activeProfileId:localStorage.getItem("pc_active_profile_v12")||localStorage.getItem("pc_active_profile_v11")||(savedProfiles?.[0]?.id||starter.id),
-  shot:JSON.parse(localStorage.getItem("pc_shot_v14")||'{"pin":"","carry":"","adjustment":0,"hasRecommendation":false}'),
+  shot:JSON.parse(localStorage.getItem("pc_shot_v15")||localStorage.getItem("pc_shot_v14")||'{"pin":"","adjustment":0,"hasRecommendation":false}'),
   tracker:JSON.parse(localStorage.getItem("pc_tracker_v12")||localStorage.getItem("pc_tracker_v11")||"[]"),
   settings:JSON.parse(localStorage.getItem("pc_settings_v13")||localStorage.getItem("pc_settings_v12")||localStorage.getItem("pc_settings_v11")||'{"attackDistanceLimit":170,"stockTolerance":5}')
 };
 if(!state.profiles.some(p=>p.id===state.activeProfileId))state.activeProfileId=state.profiles[0].id;
 
 const $=id=>document.getElementById(id);
-const els={pin:$("pinDistance"),carry:$("carryInput"),adjustments:$("adjustmentButtons"),result:$("resultCard"),profile:$("profileSelect"),clubList:$("clubList"),dialog:$("clubDialog"),form:$("clubForm"),clubId:$("clubId"),clubName:$("clubName"),clubCarry:$("clubCarry"),clubTotal:$("clubTotal"),trackerList:$("trackerList"),trackerFilter:$("trackerFilter"),attackDistanceLimit:$("attackDistanceLimit"),stockTolerance:$("stockTolerance")};
+const els={pin:$("pinDistance"),adjustments:$("adjustmentButtons"),result:$("resultCard"),profile:$("profileSelect"),clubList:$("clubList"),dialog:$("clubDialog"),form:$("clubForm"),clubId:$("clubId"),clubName:$("clubName"),clubCarry:$("clubCarry"),clubTotal:$("clubTotal"),trackerList:$("trackerList"),trackerFilter:$("trackerFilter"),attackDistanceLimit:$("attackDistanceLimit"),stockTolerance:$("stockTolerance")};
 
 function save(){
   localStorage.setItem("pc_profiles_v12",JSON.stringify(state.profiles));
   localStorage.setItem("pc_active_profile_v12",state.activeProfileId);
   localStorage.setItem("pc_tracker_v12",JSON.stringify(state.tracker));
   localStorage.setItem("pc_settings_v13",JSON.stringify(state.settings));
-  localStorage.setItem("pc_shot_v14",JSON.stringify(state.shot));
+  localStorage.setItem("pc_shot_v15",JSON.stringify(state.shot));
 }
 function profile(){return state.profiles.find(p=>p.id===state.activeProfileId)}
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
@@ -28,67 +28,34 @@ function renderClubs(){
   const clubs=[...profile().clubs].sort((a,b)=>b.total-a.total);
   els.clubList.innerHTML=clubs.map(c=>`<div class="club-row"><div><div class="club-name">${esc(c.name)}</div><div class="club-distance">Carry ${c.carry||"Not set"} · Total ${c.total}</div></div><div class="club-actions"><button class="icon-btn" data-edit="${c.id}">Edit</button><button class="icon-btn" data-delete="${c.id}">×</button></div></div>`).join("")||'<p class="muted">No clubs yet.</p>';
 }
-function getDisplayRange(club,clubs){
-  if(club.carry)return `${club.carry}–${club.total} yds`;
-  const sorted=[...clubs].sort((a,b)=>b.total-a.total);
-  const i=sorted.findIndex(c=>c.id===club.id);
-  const next=sorted[i+1];
-  return next?`${next.total}–${club.total} yds`:`Up to ${club.total} yds`;
-}
-function pickByTotal(clubs,target){
-  return [...clubs].reduce((best,club)=>{
-    if(!best)return club;
-    const clubDistance=Number(club.total);
-    const bestDistance=Number(best.total);
-    const clubDifference=Math.abs(clubDistance-target);
-    const bestDifference=Math.abs(bestDistance-target);
-    if(clubDifference<bestDifference)return club;
-    if(clubDifference===bestDifference&&clubDistance>bestDistance)return club;
-    return best;
-  },null);
-}
-function pickWithCarryRequirement(clubs,target,requiredCarry){
-  const eligible=clubs.filter(c=>c.carry&&Number(c.carry)>=requiredCarry);
-  return pickByTotal(eligible.length?eligible:clubs,target);
-}
 function recommend({track=true}={}){
-  const pin=Number(els.pin.value), requiredCarry=Number(els.carry.value);
+  const pin=Number(els.pin.value);
   if(!Number.isFinite(pin)||pin<=0){
     state.shot.hasRecommendation=false;
     save();
     els.result.innerHTML='<p class="muted">Enter a valid pin distance.</p>';
     return;
   }
-  const target=pin+state.shot.adjustment;
+
+  const target=pin+Number(state.shot.adjustment||0);
   const clubs=profile().clubs;
-  if(!clubs.length){els.result.innerHTML='<p class="muted">Add clubs to your bag first.</p>';return}
-
-  const carryEntered=Number.isFinite(requiredCarry)&&requiredCarry>0;
-  const best=carryEntered?pickWithCarryRequirement(clubs,target,requiredCarry):pickByTotal(clubs,target);
-  const hasSavedCarry=Number.isFinite(Number(best.carry))&&Number(best.carry)>0;
-  const adjustedTotalDistance=target;
-  const attackDistancePass=adjustedTotalDistance<Number(state.settings.attackDistanceLimit);
-  const stockReference=hasSavedCarry?Number(best.carry):Number(best.total);
-  const stockPass=Math.abs(stockReference-adjustedTotalDistance)<=Number(state.settings.stockTolerance);
-  const green=attackDistancePass&&stockPass;
-  const range=getDisplayRange(best,clubs);
-
-  let notes=[];
-  if(carryEntered){
-    if(hasSavedCarry){
-      notes.push(`<div class="carry-check">Carry checked: ${best.carry} yds covers the required ${requiredCarry} yds.</div>`);
-    }else{
-      notes.push(`<div class="warning">Carry could not be verified. This recommendation is based on total distance only.</div>`);
-    }
-  }else if(!hasSavedCarry){
-    notes.push(`<div class="warning">Total-distance recommendation only. No carry distance is saved for this club.</div>`);
+  if(!clubs.length){
+    els.result.innerHTML='<p class="muted">Add clubs to your bag first.</p>';
+    return;
   }
-  const note=notes.join("");
+
+  const best=pickByTotal(clubs,target);
+  const hasSavedCarry=Number.isFinite(Number(best.carry))&&Number(best.carry)>0;
+  const attackDistancePass=target<Number(state.settings.attackDistanceLimit);
+  const stockReference=hasSavedCarry?Number(best.carry):Number(best.total);
+  const stockPass=Math.abs(stockReference-target)<=Number(state.settings.stockTolerance);
+  const green=attackDistancePass&&stockPass;
 
   els.result.innerHTML=`<div class="result-split">
     <div class="result-details">
+      <div class="pin-playing">Pin Playing <strong>= ${target} yds</strong></div>
       <div class="club-name-large">${esc(best.name)}</div>
-      <div class="range-text">${range}</div>
+      <div class="range-text">${best.total} yds</div>
     </div>
     <div class="status-wrap">
       <div class="status-circle ${green?"attack":"safe"}">
@@ -102,11 +69,9 @@ function recommend({track=true}={}){
 </svg></div>`}
       </div>
     </div>
-    ${note?`<div class="result-note">${note}</div>`:""}
   </div>`;
 
   state.shot.pin=els.pin.value;
-  state.shot.carry=els.carry.value;
   state.shot.hasRecommendation=true;
   if(track){state.tracker.push({clubId:best.id,clubName:best.name,time:Date.now()});}
   save();
@@ -143,19 +108,16 @@ els.adjustments.addEventListener("click",e=>{
 $("recommendBtn").addEventListener("click",recommend);
 $("resetShotBtn").addEventListener("click",()=>{
   els.pin.value="";
-  els.carry.value="";
   state.shot.pin="";
-  state.shot.carry="";
   state.shot.hasRecommendation=false;
   save();
   els.result.innerHTML='<p class="muted">Enter a pin distance to get your recommendation.</p>';
   els.pin.focus();
 });
-[els.pin,els.carry].forEach(el=>el.addEventListener("input",()=>{
+els.pin.addEventListener("input",()=>{
   state.shot.pin=els.pin.value;
-  state.shot.carry=els.carry.value;
   save();
-}));
+});
 els.pin.addEventListener("keydown",e=>{if(e.key==="Enter")recommend()});
 els.profile.addEventListener("change",e=>{state.activeProfileId=e.target.value;save();renderClubs()});
 $("addClubBtn").addEventListener("click",()=>openClub());
@@ -198,6 +160,5 @@ document.querySelectorAll(".nav-button").forEach(btn=>btn.addEventListener("clic
 if("serviceWorker"in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js"));
 renderProfiles();renderClubs();renderTracker();
 els.pin.value=state.shot.pin||"";
-els.carry.value=state.shot.carry||"";
 [...els.adjustments.children].forEach(b=>b.classList.toggle("selected",Number(b.dataset.adjustment)===Number(state.shot.adjustment)));
 if(state.shot.hasRecommendation&&Number(state.shot.pin)>0)recommend({track:false});
