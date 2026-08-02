@@ -22,6 +22,27 @@ function save(){
   localStorage.setItem("pc_shot_v15",JSON.stringify(state.shot));
 }
 function profile(){return state.profiles.find(p=>p.id===state.activeProfileId)}
+
+function pickByTotal(clubs,target){
+  return clubs.reduce((best,club)=>{
+    if(!best)return club;
+
+    const clubDifference=Math.abs(Number(club.total)-target);
+    const bestDifference=Math.abs(Number(best.total)-target);
+
+    if(clubDifference<bestDifference)return club;
+
+    if(
+      clubDifference===bestDifference &&
+      Number(club.total)>Number(best.total)
+    ){
+      return club;
+    }
+
+    return best;
+  },null);
+}
+
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
 function renderProfiles(){els.profile.innerHTML=state.profiles.map(p=>`<option value="${p.id}" ${p.id===state.activeProfileId?"selected":""}>${esc(p.name)}</option>`).join("")}
 function renderClubs(){
