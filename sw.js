@@ -1,9 +1,9 @@
-const CACHE = "pocket-caddie-v205";
+const CACHE = "pocket-caddie-v206";
 const ASSETS = [
   "./",
   "./index.html",
-  "./styles.css?v=205",
-  "./app.js?v=205",
+  "./styles.css?v=206",
+  "./app.js?v=206",
   "./manifest.webmanifest",
   "./apple-touch-icon.png",
   "./favicon.ico",

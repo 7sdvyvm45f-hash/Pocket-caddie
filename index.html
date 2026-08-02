@@ -6,8 +6,8 @@
   <meta name="theme-color" content="#123d2c" />
   <meta name="description" content="Pocket Caddie golf club recommendation app." />
   <link rel="manifest" href="manifest.webmanifest" />
-  <link rel="apple-touch-icon" href="icons/icon-192.png" />
-  <link rel="stylesheet" href="styles.css?v=205" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <link rel="stylesheet" href="styles.css?v=206" />
   <title>Pocket Caddie</title>
 </head>
 <body>
@@ -41,6 +41,10 @@
           <button id="recommendBtn" class="primary">Recommend Club</button>
           <button id="resetShotBtn" class="ghost reset-shot">New Shot</button>
         </div>
+      </div>
+
+      <div id="pinPlayingCard" class="card pin-playing-card" hidden>
+        <div id="pinPlayingValue" class="pin-playing-value">Pin Playing = 0 yds</div>
       </div>
 
       <div id="resultCard" class="card result-card">
@@ -143,6 +147,6 @@
     </form>
   </dialog>
 
-  <script src="app.js?v=205"></script>
+  <script src="app.js?v=206"></script>
 </body>
 </html>

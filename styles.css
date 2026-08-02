@@ -123,12 +123,19 @@ dialog label{display:grid;gap:6px;font-weight:800}dialog input{border:1px solid 
 
 .gap-note{margin-top:2px;max-width:340px;padding:9px 12px;border-radius:12px;background:#edf1f5;color:#46515b;font-size:12px;font-weight:800}
 
-/* v1.8 recommendation summary */
-.pin-playing{
-  margin-bottom:4px;
-  color:var(--muted);
-  font-size:16px;
-  font-weight:800;
+/* v2.06 dedicated Pin Playing section */
+.pin-playing-card{
+  min-height:76px;
+  display:grid;
+  place-items:center;
+  padding:16px 18px;
 }
-.pin-playing strong{color:var(--green);font-size:20px}
+.pin-playing-card[hidden]{display:none}
+.pin-playing-value{
+  color:var(--green);
+  font-size:20px;
+  font-weight:900;
+  line-height:1.2;
+  text-align:center;
+}
 .result-details .range-text{margin-top:2px}

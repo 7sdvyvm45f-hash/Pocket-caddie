@@ -21,7 +21,7 @@ state.profiles.forEach(p=>{
 });
 
 const $=id=>document.getElementById(id);
-const els={pin:$("pinDistance"),adjustments:$("adjustmentButtons"),result:$("resultCard"),profile:$("profileSelect"),clubList:$("clubList"),dialog:$("clubDialog"),form:$("clubForm"),clubId:$("clubId"),clubName:$("clubName"),clubCarry:$("clubCarry"),clubTotal:$("clubTotal"),trackerList:$("trackerList"),trackerFilter:$("trackerFilter"),attackDistanceLimit:$("attackDistanceLimit"),stockTolerance:$("stockTolerance")};
+const els={pin:$("pinDistance"),adjustments:$("adjustmentButtons"),pinPlaying:$("pinPlayingCard"),pinPlayingValue:$("pinPlayingValue"),result:$("resultCard"),profile:$("profileSelect"),clubList:$("clubList"),dialog:$("clubDialog"),form:$("clubForm"),clubId:$("clubId"),clubName:$("clubName"),clubCarry:$("clubCarry"),clubTotal:$("clubTotal"),trackerList:$("trackerList"),trackerFilter:$("trackerFilter"),attackDistanceLimit:$("attackDistanceLimit"),stockTolerance:$("stockTolerance")};
 
 function save(){
   localStorage.setItem("pc_profiles_v12",JSON.stringify(state.profiles));
@@ -63,6 +63,7 @@ function recommend({track=true}={}){
   if(!Number.isFinite(pin)||pin<=0){
     state.shot.hasRecommendation=false;
     save();
+    els.pinPlaying.hidden=true;
     els.result.innerHTML='<p class="muted">Enter a valid pin distance.</p>';
     return;
   }
@@ -70,6 +71,7 @@ function recommend({track=true}={}){
   const target=pin+Number(state.shot.adjustment||0);
   const clubs=profile().clubs;
   if(!clubs.length){
+    els.pinPlaying.hidden=true;
     els.result.innerHTML='<p class="muted">Add clubs to your bag first.</p>';
     return;
   }
@@ -81,9 +83,11 @@ function recommend({track=true}={}){
   const stockPass=Math.abs(stockReference-target)<=Number(state.settings.stockTolerance);
   const green=attackDistancePass&&stockPass;
 
+  els.pinPlayingValue.textContent=`Pin Playing = ${target} yds`;
+  els.pinPlaying.hidden=false;
+
   els.result.innerHTML=`<div class="result-split">
     <div class="result-details">
-      <div class="pin-playing">Pin Playing <strong>= ${target} yds</strong></div>
       <div class="club-name-large">${esc(best.name)}</div>
       <div class="range-text">${best.total} yds</div>
     </div>
@@ -140,6 +144,7 @@ $("recommendBtn").addEventListener("click",()=>{
     recommend();
   }catch(error){
     console.error("Pocket Caddie recommendation error:",error);
+    els.pinPlaying.hidden=true;
     els.result.innerHTML='<p class="muted">Recommendation could not be calculated. Refresh the app and try again.</p>';
   }
 });
@@ -148,6 +153,7 @@ $("resetShotBtn").addEventListener("click",()=>{
   state.shot.pin="";
   state.shot.hasRecommendation=false;
   save();
+  els.pinPlaying.hidden=true;
   els.result.innerHTML='<p class="muted">Enter a pin distance to get your recommendation.</p>';
   els.pin.focus();
 });
